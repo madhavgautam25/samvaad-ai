@@ -1,14 +1,23 @@
+from app.services.ai_engine import AIEngine
+from app.core.personality import SYSTEM_PROMPT
+
+
 class ConversationEngine:
+
     def __init__(self):
-        self.history = []
+        self.ai = AIEngine()
 
-    def add_message(self, role, content):
-        self.history.append(
+    def chat(self, message):
+
+        messages = [
             {
-                "role": role,
-                "content": content
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            },
+            {
+                "role": "user",
+                "content": message
             }
-        )
+        ]
 
-    def get_history(self):
-        return self.history
+        return self.ai.generate(messages)

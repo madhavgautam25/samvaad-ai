@@ -1,14 +1,19 @@
 from fastapi import FastAPI
+from app.api.chat import router as chat_router
+from app.core.config import settings
 
 app = FastAPI(
-    title="Samvaad AI",
-    description="A multilingual conversational AI voice agent.",
-    version="1.0.0"
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="A multilingual AI voice agent."
 )
+
+app.include_router(chat_router)
 
 @app.get("/")
 def root():
     return {
-        "message": "Welcome to Samvaad AI!",
-        "status": "running"
+        "message": f"Welcome to {settings.APP_NAME}",
+        "model": settings.MODEL_NAME,
+        "provider": settings.MODEL_PROVIDER
     }
