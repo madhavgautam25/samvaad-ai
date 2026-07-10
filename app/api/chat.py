@@ -19,5 +19,8 @@ def chat(request: ChatRequest):
     engine = session_manager.get_engine(request.session_id)
 
     return {
-        "response": engine.chat(request.message)
+        "response": engine.chat(
+            request.session_id,
+            request.message
+        )
     }
