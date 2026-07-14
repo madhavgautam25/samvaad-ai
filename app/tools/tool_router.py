@@ -5,18 +5,18 @@ class ToolRouter:
 
     def __init__(self):
 
-        self.weather = WeatherTool()
+        self.tools = {
 
-    def handle(self, message):
+            "weather": WeatherTool()
 
-        text = message.lower()
+        }
 
-        if "weather" in text:
+    def execute(self, action, message):
 
-            words = text.split()
+        tool = self.tools.get(action)
 
-            city = words[-1]
+        if tool:
 
-            return self.weather.get_weather(city)
+            return tool.execute(message)
 
         return None

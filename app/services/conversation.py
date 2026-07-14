@@ -4,16 +4,19 @@ from app.models.user_profile import UserProfile
 from app.core.prompt_builder import PromptBuilder
 from app.services.user_services import UserService
 from app.core.profile_manager import ProfileManager
-from app.tools.tool_router import ToolRouter
+from app.agent.agent import Agent
+
 
 class ConversationEngine:
 
     def __init__(self):
+
         self.ai = AIEngine()
+        self.agent = Agent(self.ai)
+
         self.memory = MemoryManager()
         self.profile = UserProfile()
         self.user_service = UserService()
-        self.tool_router = ToolRouter()
 
     def chat(self, session_id, user_message):
 
@@ -126,13 +129,8 @@ class ConversationEngine:
         messages = PromptBuilder.build(
             self.memory.get_messages()
         )
-        
-        tool_response = self.tool_router.handle(user_message)
 
-        if tool_response:
-            return tool_response
-
-        response = self.ai.generate(messages)
+        response = self.agent.run(messages)
 
         self.memory.add(
             "assistant",
