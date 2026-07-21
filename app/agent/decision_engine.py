@@ -63,6 +63,26 @@ class DecisionEngine:
                 "tool": "datetime",
                 "input": message
             }
+            
+        search_keywords = [
+            "who",
+            "what",
+            "when",
+            "where",
+            "why",
+            "which",
+            "latest",
+            "news",
+            "current",
+            "search",
+        "tell me about"
+        ]
+
+        if any(word in message for word in search_keywords):
+            return {
+                "tool": "search",
+                "input": message
+            }
 
         # Default AI Chat
         return {

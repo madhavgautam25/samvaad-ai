@@ -11,23 +11,49 @@ class Agent:
 
     def run(self, messages):
 
-        # Get the latest user message
         last_message = messages[-1]["content"]
 
-        # Decide whether to use a tool
         decision = self.decision.decide(last_message)
 
         tool = decision.get("tool", "chat")
 
-        # Execute the selected tool
         if tool != "chat":
 
             payload = decision.get("input", "")
 
-            return self.router.execute(
+            tool_response = self.router.execute(
                 tool,
                 payload
             )
 
-        # Otherwise, use the LLM for normal conversation
+            if tool == "search" and tool_response.get("success"):
+
+                prompt = f"""
+    You are Samvaad AI.
+
+    Answer the user's question using ONLY the search results below.
+
+    Question:
+    {payload}
+
+    Search Results:
+    {tool_response['context']}
+
+    Instructions:
+
+    - Give a natural answer.
+    - Do not mention JSON.
+    - Keep it concise.
+    - Mention the sources at the end.
+    """
+
+                return self.ai.generate([
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ])
+
+            return tool_response
+
         return self.ai.generate(messages)
