@@ -1,4 +1,5 @@
 from app.tools.weather import WeatherTool
+from app.tools.calculator import CalculatorTool
 
 
 class ToolRouter:
@@ -6,17 +7,18 @@ class ToolRouter:
     def __init__(self):
 
         self.tools = {
-
-            "weather": WeatherTool()
-
+            "weather": WeatherTool(),
+            "calculator": CalculatorTool(),
         }
 
-    def execute(self, action, message):
+    def execute(self, tool_name, payload):
 
-        tool = self.tools.get(action)
+        tool = self.tools.get(tool_name)
 
-        if tool:
+        if not tool:
+            return {
+                "success": False,
+                "message": f"Tool '{tool_name}' not found."
+            }
 
-            return tool.execute(message)
-
-        return None
+        return tool.execute(payload)
