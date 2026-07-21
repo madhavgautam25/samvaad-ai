@@ -1,3 +1,5 @@
+import json
+
 from app.services.ai_engine import AIEngine
 from app.memory.memory_manager import MemoryManager
 from app.models.user_profile import UserProfile
@@ -132,9 +134,18 @@ class ConversationEngine:
 
         response = self.agent.run(messages)
 
+        # Convert tool responses into strings before storing
+        if isinstance(response, dict):
+            assistant_message = json.dumps(
+                response,
+                ensure_ascii=False
+            )
+        else:
+            assistant_message = response
+
         self.memory.add(
             "assistant",
-            response
+            assistant_message
         )
 
         return response

@@ -1,57 +1,71 @@
-import re
-
-
 class DecisionEngine:
 
     def decide(self, message: str):
 
-        msg = message.lower().strip()
+        message = message.lower()
 
-        # ---------------- Weather ---------------- #
-
+        # Weather Tool
         weather_keywords = [
             "weather",
             "temperature",
             "forecast",
             "rain",
-            "umbrella",
             "humidity",
-            "wind"
+            "wind",
+            "climate"
         ]
 
-        if any(word in msg for word in weather_keywords):
+        if any(keyword in message for keyword in weather_keywords):
             return {
                 "tool": "weather",
                 "input": message
             }
 
-        # ---------------- Calculator ---------------- #
-
+        # Calculator Tool
         calculator_keywords = [
+            "+", "-", "*", "/", "%",
             "calculate",
             "calc",
+            "solve",
             "plus",
             "minus",
-            "multiply",
+            "times",
             "multiplied",
-            "divide",
+            "multiply",
             "divided",
+            "divide",
             "mod",
             "power",
-            "sqrt",
-            "log"
+            "raised"
         ]
 
-        math_symbols = re.search(r"[0-9+\-*/()%^.]", msg)
-
-        if any(word in msg for word in calculator_keywords) or math_symbols:
+        if any(keyword in message for keyword in calculator_keywords):
             return {
                 "tool": "calculator",
                 "input": message
             }
 
-        # ---------------- Default Chat ---------------- #
+        # Date & Time Tool
+        datetime_keywords = [
+            "time",
+            "date",
+            "today",
+            "day",
+            "clock",
+            "yesterday",
+            "tomorrow",
+            "current time",
+            "current date"
+        ]
 
+        if any(keyword in message for keyword in datetime_keywords):
+            return {
+                "tool": "datetime",
+                "input": message
+            }
+
+        # Default AI Chat
         return {
-            "tool": "chat"
+            "tool": "chat",
+            "input": message
         }

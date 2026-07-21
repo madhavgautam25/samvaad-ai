@@ -3,50 +3,70 @@ import re
 
 class ExpressionParser:
 
+    def __init__(self):
+
+        self.replacements = {
+            "multiplied by": "*",
+            "multiply by": "*",
+            "times": "*",
+            "into": "*",
+            "x": "*",
+
+            "divided by": "/",
+            "divide by": "/",
+            "over": "/",
+
+            "plus": "+",
+            "add": "+",
+
+            "minus": "-",
+            "subtract": "-",
+
+            "modulus": "%",
+            "mod": "%",
+
+            "raised to": "**",
+            "power of": "**",
+            "to the power of": "**"
+        }
+
+        self.remove_words = [
+            "what is",
+            "calculate",
+            "compute",
+            "solve",
+            "find",
+            "evaluate",
+            "please",
+            "can you",
+            "could you",
+            "tell me",
+            "answer",
+            "equals",
+            "=",
+            "?",
+            ","
+        ]
+
     def parse(self, message: str) -> str:
 
         expression = message.lower().strip()
 
-        # Remove common words
-        words = [
-            "what is",
-            "calculate",
-            "calc",
-            "solve",
-            "equals",
-            "=",
-            "please",
-            "can you",
-            "find"
-        ]
+        # Remove unnecessary words
+        for word in self.remove_words:
+            expression = expression.replace(word, " ")
 
-        for word in words:
-            expression = expression.replace(word, "")
+        # Replace English operators
+        for word, symbol in self.replacements.items():
+            expression = expression.replace(word, f" {symbol} ")
 
-        # Convert words to operators
-        replacements = {
-            "plus": "+",
-            "minus": "-",
-            "times": "*",
-            "multiplied by": "*",
-            "multiply by": "*",
-            "x": "*",
-            "into": "*",
-            "divided by": "/",
-            "divide by": "/",
-            "mod": "%",
-            "modulus": "%",
-            "power of": "**",
-            "raised to": "**"
-        }
+        # Normalize spaces
+        expression = re.sub(r"\s+", " ", expression).strip()
 
-        for key, value in replacements.items():
-            expression = expression.replace(key, value)
-
-        # Remove spaces
+        # Remove spaces around operators
         expression = expression.replace(" ", "")
 
-        # Keep only valid calculator characters
-        expression = re.sub(r"[^0-9+\-*/().%*]", "", expression)
+        # Keep only valid mathematical characters
+        expression = re.sub(r"[^0-9+\-*/().%]", "", expression)
 
         return expression
