@@ -8,6 +8,7 @@ class ExpressionParser:
         self.replacements = {
             "multiplied by": "*",
             "multiply by": "*",
+            "multiply": "*",
             "times": "*",
             "into": "*",
             "x": "*",
@@ -18,9 +19,11 @@ class ExpressionParser:
 
             "plus": "+",
             "add": "+",
+            "added to": "+",
 
             "minus": "-",
             "subtract": "-",
+            "subtracted from": "-",
 
             "modulus": "%",
             "mod": "%",

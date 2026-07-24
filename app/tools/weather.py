@@ -23,17 +23,19 @@ class WeatherTool(BaseTool):
 
         return any(word in text for word in keywords)
 
-    def execute(self, payload):
+    # ----------------------------------------------------
 
-        city = payload.get("city")
+    def execute(self, query):
+
+        city = self.extract_city(query)
 
         if not city:
-            return "❌ City not found."
+            return "❌ Please mention a city name."
 
         coordinates = self.get_coordinates(city)
 
         if coordinates is None:
-            return f"❌ Couldn't find {city}."
+            return f"❌ Couldn't find '{city}'."
 
         latitude, longitude = coordinates
 
@@ -53,73 +55,87 @@ class WeatherTool(BaseTool):
         )
 
         return f"""
-    🌤 Samvaad Weather Report
+🌤 Samvaad Weather Report
 
-    📍 City : {city}
+📍 City : {city.title()}
 
-    ☁️ Condition : {condition}
+☁️ Condition : {condition}
 
-    🌡 Temperature : {weather['temperature']}°C
+🌡 Temperature : {weather['temperature']}°C
 
-    🥵 Feels Like : {weather['feels_like']}°C
+🥵 Feels Like : {weather['feels_like']}°C
 
-    💧 Humidity : {weather['humidity']}%
+💧 Humidity : {weather['humidity']}%
 
-    💨 Wind Speed : {weather['wind_speed']} km/h
+💨 Wind Speed : {weather['wind_speed']} km/h
 
-    🌅 Sunrise : {weather['sunrise']}
+🌅 Sunrise : {weather['sunrise']}
 
-    🌇 Sunset : {weather['sunset']}
+🌇 Sunset : {weather['sunset']}
 
-    🤖 Recommendation
+🤖 Recommendation
 
-    {recommendation}
-    """
+{recommendation}
+"""
+
     # ----------------------------------------------------
 
     def extract_city(self, message):
 
         text = message.lower()
 
-        text = re.sub(r"[?.,!]", "", text)
+        # Remove punctuation
+        text = re.sub(r"[^\w\s]", "", text)
 
-        remove_words = [
+        # Words that are NOT part of a city
+        stop_words = {
+            "weather",
+            "temperature",
+            "forecast",
+            "rain",
             "today",
             "tomorrow",
             "now",
             "currently",
-            "please"
-        ]
+            "please",
+            "the",
+            "of",
+            "in",
+            "at",
+            "for",
+            "is",
+            "what",
+            "whats",
+            "how",
+            "show",
+            "tell",
+            "me",
+            "like",
+            "will",
+            "be",
+            "its",
+            "it",
+            "current",
+            "check",
+            "give",
+            "can",
+            "you",
+            "update",
+            "updates"
+        }
 
-        words = [
+        words = text.split()
+
+        city_words = [
             word
-            for word in text.split()
-            if word not in remove_words
+            for word in words
+            if word not in stop_words
         ]
 
-        text = " ".join(words)
+        if not city_words:
+            return None
 
-        patterns = [
-
-            r"weather in ([a-zA-Z ]+)",
-
-            r"temperature in ([a-zA-Z ]+)",
-
-            r"forecast for ([a-zA-Z ]+)",
-
-            r"weather ([a-zA-Z ]+)"
-
-        ]
-
-        for pattern in patterns:
-
-            match = re.search(pattern, text)
-
-            if match:
-
-                return match.group(1).strip()
-
-        return None
+        return " ".join(city_words).title()
 
     # ----------------------------------------------------
 
@@ -137,7 +153,7 @@ class WeatherTool(BaseTool):
 
         data = response.json()
 
-        if "results" not in data:
+        if "results" not in data or len(data["results"]) == 0:
             return None
 
         result = data["results"][0]
@@ -173,7 +189,6 @@ class WeatherTool(BaseTool):
         data = response.json()
 
         current = data["current"]
-
         daily = data["daily"]
 
         return {

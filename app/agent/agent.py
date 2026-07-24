@@ -1,7 +1,6 @@
 from app.agent.decision_engine import DecisionEngine
 from app.tools.tool_router import ToolRouter
 
-
 class Agent:
 
     def __init__(self, ai_engine):

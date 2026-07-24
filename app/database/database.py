@@ -1,6 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+from app.models.user_profile import UserProfile
+from app.models.memory import Memory
+
 DATABASE_URL = "sqlite:///samvaad.db"
 
 engine = create_engine(
